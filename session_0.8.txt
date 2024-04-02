@@ -1,0 +1,5 @@
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-02 18:11:02.184900
+-----------------------

@@ -3,6 +3,8 @@ import threading
 import tkinter as tk
 from io import BytesIO
 from tkinter import messagebox
+
+import mss
 import numpy as np
 import pyautogui as p
 import keyboard
@@ -38,36 +40,27 @@ class Mobile2Bot:
     eldiven_var = False
 
     def __init__(self):
-        self.check_date()
+        # self.check_date()
+
         self.img_dict = self.read_images_in_folder()
-        self.inv_coordinates = [(800, 220), (833, 220), (866, 220), (899, 220), (932, 220), (965, 220), (800, 253),
-                                (833, 253), (866, 253), (899, 253), (932, 253), (965, 253), (800, 286), (833, 286),
-                                (866, 286), (899, 286), (932, 286), (965, 286), (800, 319), (833, 319), (866, 319),
-                                (899, 319), (932, 319), (965, 319), (800, 352), (833, 352), (866, 352), (899, 352),
-                                (932, 352), (965, 352), (800, 385), (833, 385), (866, 385), (899, 385), (932, 385),
-                                (965, 385), (800, 418), (833, 418), (866, 418), (899, 418), (932, 418), (965, 418),
-                                (800, 451), (833, 451), (866, 451), (899, 451), (932, 451), (965, 451)]
-        self.vault_coord = [(369, 170), (417, 170), (465, 170), (513, 170), (561, 170), (609, 170), (225, 218), (273, 218), (321, 218), (369, 218), (417, 218), (465, 218), (513, 218), (561, 218), (609, 218), (225, 266), (273, 266), (321, 266), (369, 266), (417, 266), (465, 266), (513, 266), (561, 266), (609, 266), (225, 314), (273, 314), (321, 314), (369, 314), (417, 314), (465, 314), (513, 314), (561, 314), (609, 314), (225, 362), (273, 362), (321, 362), (369, 362), (417, 362), (465, 362), (513, 362), (561, 362), (609, 362)]
-        self.dont_take_names = ["beyaz_boya", "renkli_boya", "sari_boya", "siyah_boya", "kirmizi_boya", "pelerin",
-                                "altin_yuzuk", "madalyon", "eldiven"]
-        self.bait_type = "solucan"
+        self.bait_type = "hamur"
         self.is_running = False  # Flag to control the game cycle
         self.game_cycle_thread = None
         self.party_detection_running = False
-        self.inventory_count = 2
+        self.inventory_count = 1
         self.total_count = 0
         self.caught_count = 0
         self.valuable_count = 0
         self.delay_time = 0.8  # Default delay time
 
-        self.api_key = '2b0b48d582ce9683dc55066b1d4ebb12'
-        self.comment_image_path = "comment_image.jpg"
-        self.comment = ""  # Optional instruction for the worker
-
-        # self.detect_bot_control()
-
-
-
+        self.fish_detector()
+        time.sleep(3)
+        self.use_bait_new()
+        time.sleep(3)
+        self.moving_rod_throw()
+        time.sleep(2)
+        self.fish_detector()
+        quit()
 
     def check_date(self):
         current_time = time.time()
@@ -109,30 +102,6 @@ class Mobile2Bot:
         with open(f"session_{self.delay_time}.txt", "a") as session_file:
             session_file.write(f"total tries: {self.total_count}\ncaught: {self.caught_count}\nvaluable: {self.valuable_count}\ncurrent date: {currentDateAndTime}\n-----------------------\n")
 
-    # def start_party_detection(self):
-    #     self.party_detection_running = True
-    #     self.party_detection_thread = threading.Thread(target=self.party_detection_function)
-    #     self.party_detection_thread.start()
-    #
-    # def stop_party_detection(self):
-    #     self.party_detection_running = False
-    #     # self.party_detection_thread.join()
-    #
-    # def party_detection_function(self):
-    #     # while self.is_running and self.party_detection_running:
-    #     time.sleep(0.1)
-    #     leader_disc = p.pixelMatchesColor(120,338,(58,56,58),10)
-    #     # print(p.pixel(120,338))
-    #     # print("leader is disconnected",leader_disc)
-    #     if leader_disc:
-    #         self.send_notification("Leader Disconnected",True)
-    #         # Stop bot functionality
-    #         self.stop_party_detection()
-    #         self.close_game()
-    #         self.stop_game_cycle()
-    #         time.sleep(150)
-    #         print("2.5 min passed")
-    #         self.is_running=True
 
 
     def send_notification(self,message,send_screenshot=False):
@@ -150,10 +119,8 @@ class Mobile2Bot:
 
         requests.post("https://api.pushover.net/1/messages.json", data={
 
-            # "token": "axkpeqe4nasi8avdohn4iwzmzroka8", # cemil
             "token": "a9qutshv8twt4tchs7rvnkqeofhgfk", # canberk
             # "token": "adyvnj3co61qo45opertrtyds6k8ee", # baris
-            # "user": "uskopzecnkrn9vkq7duak9hmsno9ic", # cemil
             "user": "uofkgkwu6twdiptnjdi9kqkx616eqr",  # canberk
             # "user": "ugy4145hw2trh1kkwnw3w2ap3eegcn", # baris
             "message": message
@@ -195,51 +162,8 @@ class Mobile2Bot:
                 count = 0
                 time.sleep(1)
                 self.use_bait_new()
-                # self.key_press("w")
-                # self.key_press("w")
-                # self.key_press("w")
-                # self.rod_interact()
-                self.key_press("a")
                 self.moving_rod_throw()
-
-                # running false olsa da buraya kadar çalışıyo
-                # stop için fonksiyon içine oyunu kapatma yerleştirilebilir
-                while self.is_running:
-                    # self.party_detection_function()
-                    count += 1
-                    if count%10==0:
-                        # add image recog to see if char has disappeared
-                        # if so, restart fishing cycle
-                        self.key_press("w")
-                    if self.is_fish_caught():
-                        time.sleep(self.delay_time)
-                        self.rod_interact()
-                        time.sleep(2)
-                        if self.is_fish_fetched():
-                            done,valuable = self.detect_and_get_fish()
-                            if done:
-                                self.caught_count+=1
-                                if valuable:
-                                    self.valuable_count+=1
-                                self.focus_game()
-                                time.sleep(1)
-                                break
-                        else:
-                            break
-                    if self.is_fish_fetched():
-                        done, valuable = self.detect_and_get_fish()
-                        if done:
-                            self.caught_count += 1
-                            if valuable:
-                                self.valuable_count += 1
-                            self.focus_game()
-                            time.sleep(1)
-                            break
-                    if count == 40:
-                        break
-                    time.sleep(0.4)
-                    print(count)
-                self.total_count+=1
+                self.fish_detector()
         except Exception as e:
             with open("log.txt", "a") as log_file:
                 log_file.write(str(e))
@@ -278,19 +202,20 @@ class Mobile2Bot:
         keyboard.release(key)
 
     def moving_rod_throw(self):
+        p.moveTo(300, 620)
         time.sleep(0.1)
-        keyboard.press("w")
-        time.sleep(1)
-        self.rod_interact()
+        p.mouseDown(button="left")
+        time.sleep(0.1)
+        p.moveTo(300, 0)
         time.sleep(0.5)
-        keyboard.release("w")
+        self.key_press("space")
+        time.sleep(0.5)
+        p.mouseUp(button="left")
 
     def choose_character(self,slot):
-        move_right_button = 630,520
-        for _ in range(slot):
-            self.mouse_click("left",move_right_button[0],move_right_button[1])
-            time.sleep(2)
-        self.mouse_click("left",920,500)
+        self.mouse_click("left",260,160+90*slot)
+        time.sleep(0.5)
+        self.mouse_click("left",1000,590)
 
     def start_bait_thread(self,func):
         if func == 0:
@@ -368,19 +293,8 @@ class Mobile2Bot:
                 break
 
 
-    def check_states(self):
-        server_closed = self.locate_image_rgb_fs(self.img_dict["server_closed"])
-        banned = self.locate_image_rgb_fs(self.img_dict["banned"])
-        connect = self.locate_image_rgb_fs(self.img_dict["connect"])
-        start = self.locate_image_rgb_fs(self.img_dict["start"])
-        connected_but_loading = self.locate_image_rgb_fs(self.img_dict["connected_but_loading"])
-        menu = self.locate_image_rgb_fs(self.img_dict["menu"])
-        respawn_here = self.locate_image_rgb_fs(self.img_dict["respawn_here"])
-        game_logo_white = self.locate_image_rgb_fs(self.img_dict["game_logo_white"],(10,60,40,100))
-        states_dict = {"server_closed":server_closed,"banned":banned,"connect":connect,"start":start,
-                       "connected_but_loading":connected_but_loading,"menu":menu,"respawn_here":respawn_here,
-                       "game_logo_white":game_logo_white}
-        return states_dict
+    def open_inventory(self):
+        self.mouse_click("left",890,80)
 
     def is_inventory_open(self):
         detected,_,_ = self.locate_image_rgb_fs(self.img_dict["inventory_open"],bbox=(820,45,1000,72))
@@ -389,201 +303,15 @@ class Mobile2Bot:
             return self.is_inventory_open()
         return True
 
-    def detect_bot_control(self):
-        detected,_,_ = self.locate_image_rgb_fs(self.img_dict["bot_control"],bbox = (570,35,700,70))
-        count=0
-        while detected:
-            # count+=1
-            # if count>=5:
-            #     print("This is 5th Captcha in a Row. Restarting the Game Now...")
-            #     self.close_game()
-            #     return False
-            print(f"Bot Control Detected...\nSolving Captcha Number {count}!")
-            self.solve_captcha()
-            time.sleep(5)
-            detected, _, _ = self.locate_image_rgb_fs(self.img_dict["bot_control"], bbox=(570,35,700,70))
-        else:
-            return True
-
-    def encode_image_to_base64(self, image_path):
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-
-    # Function to send the CAPTCHA to 2Captcha using CoordinatesTask
-    def send_captcha_for_solving(self, api_key, captcha_type, image_path, comment="", ):
-        url = "https://api.2captcha.com/createTask"
-        body = self.encode_image_to_base64(image_path)
-        img_comment = self.encode_image_to_base64(self.comment_image_path)
-        task = {
-            "type": captcha_type,
-            "body": body,
-            "comment": "Check image instruction",
-            "imgInstructions": img_comment
-        }
-        data = {
-            'clientKey': api_key,
-            'task': task,
-            'json': 1,  # Request the response in JSON format
-            'lang': 'en',
-        }
-        response = requests.post(url, json=data)  # Ensure to use json=data to send JSON payload
-        return response.json()
-
-    # Function to check for the solution
-    def check_solution(self, api_key, captcha_id):
-        url = "http://2captcha.com/res.php"
-        params = {
-            'key': api_key,
-            'action': 'get',
-            'id': captcha_id,
-            'json': 1
-        }
-        while True:
-            response = requests.get(url, params=params)
-            result = response.json()
-            print(result)
-            if result.get('status') == 1:
-                return result['request']  # The solution
-            elif result.get('request') != 'CAPCHA_NOT_READY':
-                print(f"Error: {result.get('request')}")
-                return None
-            time.sleep(5)  # Wait for a few seconds before checking again
-
-
-    def screenshot_based_on_color(self):
-        # Define the white threshold
-        white_threshold = (230, 230, 230)  # Consider near white if R, G, and B are all above these values
-        captcha_size = ""
-
-        detected, pos, presicion = self.locate_image_rgb_fs(self.img_dict["captcha_logo"])
-        print(detected, pos, presicion)
-
-        is_big = p.pixelMatchesColor(pos[0]-240, pos[1]-530, white_threshold, tolerance=30)
-        is_small_type_1 = p.pixelMatchesColor(pos[0]-180, pos[1]-550, white_threshold, tolerance=30)
-        # is_small_type_2 = p.pixelMatchesColor(pos[0]-240, pos[1]-530, white_threshold, tolerance=30)
-
-        # Check if the pixel at (440, 120) is near white
-        if is_big:
-            captcha_image_coordinates = pos[0]-160, pos[1]-440, pos[0] + 190, pos[1] - 100
-            comment_image_coordinates = pos[0]-240, pos[1]-530, pos[0] + 270, pos[1] - 450
-            p.screenshot('captcha_big.jpg', region=(captcha_image_coordinates[0], captcha_image_coordinates[1],
-                                                    350, 340))
-            p.screenshot('comment_image.jpg', region=(comment_image_coordinates[0], comment_image_coordinates[1],
-                                                    510, 80))
-            captcha_size = "big"
-
-        elif is_small_type_1:
-            captcha_image_coordinates = pos[0] - 180, pos[1] - 430, pos[0] + 210, pos[1] - 40
-            comment_image_coordinates = pos[0] - 180, pos[1] - 550, pos[0] + 210, pos[1] - 440
-            p.screenshot('captcha_small.jpg', region=(captcha_image_coordinates[0], captcha_image_coordinates[1],
-                                                    390, 390))
-            p.screenshot('comment_image.jpg', region=(comment_image_coordinates[0], comment_image_coordinates[1],
-                                                      390, 120))
-            captcha_size = "small_type_1"
-        # elif p.pixelMatchesColor(380, 130, white_threshold, tolerance=30):
-        #     # If not, and (595,125) is white, take a screenshot from (595,125) to (990,720)
-        #     p.screenshot('captcha_small.jpg', region=(380, 130, 290, 360))
-        #     p.screenshot('comment_image.jpg', region=(380, 130, 290, 360))
-        #     captcha_size = "small_type_2"
-
-        return captcha_size, captcha_image_coordinates
-
-    def solve_captcha(self):
-        self.focus_game()
-        if self.locate_image_rgb_fs(self.img_dict["i_am_human"],precision=0.8)[0]:
-            self.mouse_click("left", 430, 420, 1)
-        # Call the function
-        while not (self.locate_image_rgb_fs(self.img_dict["skip"])[0] or self.locate_image_rgb_fs(self.img_dict["verify"])[0]):
-            time.sleep(1)
-            print("Waiting for Captcha to Load...")
-            if not self.locate_image_rgb_fs(self.img_dict["bot_control"])[0]:
-                print("Bot Control is Already Done!")
-                return
-            if self.locate_image_rgb_fs(self.img_dict["i_am_human"])[0]:
-                self.mouse_click("left", 430, 420, 1)
-        else:
-            self.focus_game()
-        captcha_size, captcha_image_coordinates = self.screenshot_based_on_color()
-        print("Captcha size:", captcha_size)
-
-        # Main process
-
-        if captcha_size == "big":
-            image_path = "captcha_big.jpg"
-            detected,pos,_ = self.locate_image_rgb_fs(self.img_dict["skip"])
-            self.mouse_click("left",pos[0]+20,pos[1]+20)
-            time.sleep(2)
-            self.mouse_click("left",pos[0]+20,pos[1]+20)
-        elif captcha_size == "small_type_1":
-            image_path = "captcha_small.jpg"
-            detected, pos, _ = self.locate_image_rgb_fs(self.img_dict["skip"])
-            self.mouse_click("left",780,280)
-            self.mouse_click("left",780,410)
-            self.mouse_click("left",780,540)
-            self.mouse_click("left",pos[0]+20,pos[1]+20)
-        # api_key = self.api_key
-        # comment = self.comment
-        # image_path = self.comment_image_path
-        #
-        # # Sending the CAPTCHA
-        # if captcha_size == "big":
-        #     response = self.send_captcha_for_solving(api_key, "CoordinatesTask", image_path, comment)
-        # elif captcha_size == "small_type_1":
-        #     response = self.send_captcha_for_solving(api_key, "GridTask", image_path, comment)
-        # if response.get('errorId') == 0:
-        #     task_id = response.get('taskId')
-        #     print(f"Captcha sent successfully. Task ID: {task_id}")
-        #     # Polling for the solution
-        #     solution = self.check_solution(api_key, task_id)
-        #     if solution:
-        #         print(f"Captcha Solved: {solution}")
-        #         if captcha_size == "big":
-        #             x = int(solution[0]['x']) + captcha_image_coordinates[0]
-        #             y = int(solution[0]['y']) + captcha_image_coordinates[1]
-        #             # Move the mouse to the coordinate and click
-        #             self.mouse_click("left",x,y)
-        #
-        #         elif captcha_size == "small_type_1":
-        #             grids_to_click = []
-        #             for char in solution:
-        #                 if char.isdigit():
-        #                     grids_to_click.append(int(char))
-        #             print(grids_to_click)
-        #             if len(grids_to_click)<3:
-        #                 return
-        #             for num in grids_to_click:
-        #                 x = 520+(num-1)%3*130
-        #                 y = 280+((num+2)//3-1)*130
-        #                 self.mouse_click("left",x,y,1)
-        #                 print(x,y)
-        #         _, pos, _ = self.locate_image_rgb_fs(self.img_dict["verify"])
-        #         self.mouse_click("left", pos[0] + 30, pos[1] + 20)
-        #     else:
-        #         print("Failed to retrieve captcha solution")
-        # else:
-        #     print(f"Failed to send captcha: {response.get('errorDescription')}")
-
-    def is_fish_caught(self):
-        detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict["balik"], (490, 230, 530, 270), self.fish_sens)
-        return detected
-
-    def is_fish_fetched(self):
-        detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict["x_button"], (570, 215, 590, 230), 0.8)
-        return detected
-
-    def is_player_dead(self,close_if_dead = True):
-        detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict["respawn"], precision= 0.8)
-        if close_if_dead and detected:
-            print("Character died")
-            self.close_game()
-        return detected
-
-
     def use_bait_new(self):
-        self.focus_game()
-        detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type], (780, 380, 980, 470), self.bait_sens)
+        self.open_inventory()
+        time.sleep(0.5)
+        detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type], (820, 280, 1180, 640), self.bait_sens)
         if detected:
-            self.mouse_click("right", pos[0] + 10 + 780, pos[1] + 10 + 380)
+            self.mouse_click("left", pos[0] + 10 + 780, pos[1] + 10 + 380)
+            self.mouse_click("left", pos[0] + 10 + 780, pos[1] + 10 + 380)
+            # self.mouse_click("left",710,590)
+            self.mouse_click("left",1160,210)
         else:
             print("no bait left")
             self.stop_game_cycle()
@@ -591,6 +319,61 @@ class Mobile2Bot:
 
     def rod_interact(self):
         self.key_press("space")
+
+    def fish_detector(self):
+        detection_threshold = 100
+        key_to_press = 'space'
+        count=0
+
+        """
+        Detects a red object within a specified screen area and simulates a key press when the object disappears (indicating it's time to 'get the fish').
+
+        Parameters:
+        - monitor_area: A dictionary with 'top', 'left', 'width', and 'height' keys defining the screen area to monitor.
+        - lower_red_hsv: The lower bound of the HSV values to detect the red object.
+        - upper_red_hsv: The upper bound of the HSV values to detect the red object.
+        - detection_threshold: The threshold for detecting a significant change in red object presence.
+        - key_to_press: The key to simulate pressing when the red object is detected to disappear.
+        """
+        with mss.mss() as sct:
+            print("Monitoring for red object. Press Ctrl+C to stop.")
+            try:
+                while True:
+                    # Capture the specified area of the screen
+                    img = np.array(sct.grab({'top': 80, 'left': 460, 'width': 240, 'height': 100}))
+
+                    # Convert the image from BGR to HSV
+                    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+                    # Create a mask that only includes pixels within the specified red HSV range
+                    mask = cv2.inRange(hsv_img, (0, 169, 157), (10, 189, 237))
+
+                    # Use the mask to isolate the red parts of the image
+                    result_img = cv2.bitwise_and(img, img, mask=mask)
+
+                    # Save the original and masked images for inspection
+                    cv2.imwrite('original_image.jpg', img)
+                    cv2.imwrite('masked_image.jpg', result_img)
+
+                    # Sum the values in the mask to determine the amount of red detected
+                    red_detected = np.sum(mask)
+                    print(red_detected)
+
+                    # Check if the red object is detected based on the threshold
+                    if red_detected < detection_threshold:
+                        count+=1
+                        if count>=3:
+                            print("Red object possibly underwater, fetching the rod!")
+                            self.key_press("space")  # Simulate the key press to fetch the rod
+                            self.key_press("space")  # Simulate the key press to fetch the rod
+                            time.sleep(1)  # Wait a bit before continuing to monitor
+                            break
+                    else:
+                        count=0
+
+                    time.sleep(0.1)  # Short delay to avoid excessive CPU usage
+            except KeyboardInterrupt:
+                print("Stopped monitoring.")
 
     def detect_and_get_fish(self):
 
@@ -641,7 +424,7 @@ class Mobile2Bot:
     def check_game_is_open(self):
         game_is_open = None
         # Get the window handle (replace 'Your Window Title' with the actual window title)
-        window_title = "Mobile2 Global  "
+        window_title = "BlueStacks App Player"
         hwnd = win32gui.FindWindow(None, window_title)
 
         if hwnd == 0:
@@ -651,14 +434,49 @@ class Mobile2Bot:
             game_is_open=True
         return game_is_open
 
+    def check_game_freeze(self,capture_interval=5, tolerance=1):
+
+        """
+        Periodically captures the screen and compares it to the previous capture to assess if the screen is frozen.
+
+        Parameters:
+        - capture_interval: The time interval (in seconds) between screen captures.
+        - tolerance: The tolerance level for changes in the pixel values to consider the screen as not frozen.
+                     This accounts for minor fluctuations that might not indicate the screen is genuinely frozen.
+        """
+        with mss.mss() as sct:
+            # Capture the initial screen state
+            monitor = sct.monitors[1]  # Default to primary monitor
+            prev_capture = np.array(sct.grab(monitor))
+
+            try:
+                while True:
+                    time.sleep(capture_interval)  # Wait for the specified interval
+                    # Capture the current screen state
+                    current_capture = np.array(sct.grab(monitor))
+
+                    # Compare the current capture to the previous one
+                    if np.sum(np.abs(current_capture - prev_capture)) <= tolerance:
+                        print("The screen might be frozen.")
+                    else:
+                        print("The screen is not frozen.")
+
+                    # Update the previous capture
+                    prev_capture = current_capture
+            except KeyboardInterrupt:
+                print("Stopped monitoring.")
+
 
     def focus_game(self):
-        self.mouse_click("left",50,15)
+        self.mouse_click("left",450,15)
 
     def close_game(self):
-        self.mouse_click("left", 1230, 15)
+        self.mouse_click("left", 1250, 700)
+        self.mouse_click("left", 850, 90)
 
-
+    def find_game_logo_and_click(self):
+        _, pos, _ = self.locate_image_rgb_fs(self.img_dict["Game_logo"])  # game logo on desktop
+        self.mouse_click("left", pos[0], pos[1])
     def open_game(self):
         retry_count = 0
         # if self.is_running:
@@ -666,19 +484,16 @@ class Mobile2Bot:
         if not self.check_game_is_open():
             # self.stop_image_detection() # so the auto login works
 
-            self.mouse_click("left",1315,630) # game logo on desktop
-            self.key_press("enter")
+            self.find_game_logo_and_click()
             game_open_checker = 0
             while not self.check_game_is_open():
                 time.sleep(0.5)
                 game_open_checker+=1
                 if game_open_checker >= 30:
-                    self.mouse_click("left", 1315,630)
-                    self.key_press("enter")
+                    self.find_game_logo_and_click()
                     game_open_checker=0
             self.resize_window()
             time.sleep(10)
-            # ch1 = 530,60
             connected = False
             launch_start_time= time.time()
             while not connected:
@@ -704,7 +519,6 @@ class Mobile2Bot:
                             return
                     self.key_press("enter")
             time.sleep(1)
-            self.attach_cheat_engine()
             self.focus_game()
             self.choose_character(self.character_number)
             if self.set_ui():
@@ -727,18 +541,14 @@ class Mobile2Bot:
 
     def set_ui(self):
         trial_count = 0
-        inv_coords = [(845, 150),(935, 150),(845, 180),(935, 180)]
+        inv_coords = [(850, 260),(935, 150),(845, 180),(935, 180)]
         while True:
             detected, pos, _ = self.locate_image_rgb_fs(self.img_dict["connected_but_loading"])
             if not detected:
                 detected, pos, _ = self.locate_image_rgb_fs(self.img_dict["menu"])
                 if detected:
-                    self.mouse_click("left", 50, 10)
-                    self.key_press("I")
-                    for _ in range(4):
-                        self.key_press("f")
-                        self.key_press("g")
-                    self.mouse_click("left",inv_coords[self.inventory_count-1][0],inv_coords[self.inventory_count-1][1])
+                    self.mouse_click("left", 890, 90) # open inventory
+                    self.mouse_click("left",850+(self.inventory_count-1)*60, 260)
                     time.sleep(0.5)
                     return True
             time.sleep(1)
@@ -750,11 +560,10 @@ class Mobile2Bot:
 
     def choose_server(self):
         ch_num= self.channel_number-1
-        ch_coords = [(670 + i * 100, 70 + j * 30) for j in range(3) for i in range(3)]
+        ch_coords = [(600 + i * 200, 300 + j * 40) for j in range(3) for i in range(2)]
         print(ch_coords)
         print(ch_coords[ch_num])
         self.mouse_click("left", ch_coords[ch_num][0], ch_coords[ch_num][1])
-        self.mouse_click("left", 1155, 175)
 
     def check_is_connected(self):
         trial_count = 0
@@ -802,7 +611,7 @@ class Mobile2Bot:
     def resize_window(self):
 
         # Get the window handle (replace 'Your Window Title' with the actual window title)
-        window_title = "Mobile2 Global  "
+        window_title = "BlueStacks App Player"
         hwnd = win32gui.FindWindow(None, window_title)
 
         if hwnd != 0:
@@ -822,7 +631,7 @@ class Mobile2Bot:
     def create_gui(self):
         # Create the main window
         self.root = tk.Tk()
-        self.root.title('Mobile2 Bot')
+        self.root.title('Royale2 Bot')
 
         # Set the position of the window
         self.root.geometry("+10+400")
@@ -1077,7 +886,7 @@ class Mobile2Bot:
 
     def read_images_in_folder(self):
         image_dict = {}
-        folders = ["cheat_engine", "dont_take", "inv_items", "items", "misc", "states","captcha"]
+        folders = ["buttons","fish","misc"]
         for inner_folder in folders:
             folder_path = os.getcwd()
             images_path = os.path.join(folder_path, f"images/{inner_folder}")
