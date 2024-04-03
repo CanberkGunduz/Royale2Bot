@@ -263,3 +263,13 @@ caught: 0
 valuable: 0
 current date: 2024-04-03 17:45:51.099587
 -----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 18:09:42.320987
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 18:10:49.448810
+-----------------------

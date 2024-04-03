@@ -139,7 +139,7 @@ class Mobile2Bot:
                 print("Game cycle is working")
                 time.sleep(1)
                 self.use_bait_new()
-                time.sleep(1)
+                # time.sleep(1)
                 self.moving_rod_throw()
                 time.sleep(3)
                 self.fish_detector()
@@ -186,9 +186,9 @@ class Mobile2Bot:
         p.mouseDown(button="left")
         time.sleep(0.1)
         p.moveTo(300, 0)
-        time.sleep(0.5)
+        time.sleep(0.2)
         self.key_press("space")
-        time.sleep(0.5)
+        time.sleep(0.2)
         p.mouseUp(button="left")
 
     def choose_character(self):
@@ -243,17 +243,16 @@ class Mobile2Bot:
 
     def use_bait_new(self):
         self.open_inventory()
-        time.sleep(0.5)
         detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type], (820, 280, 1180, 640), self.bait_sens)
         if detected:
             self.mouse_click("left", pos[0] + 10 + 820, pos[1] + 10 + 280)
+            time.sleep(0.1)
             self.mouse_click("left", 710,590)
             # self.mouse_click("left",710,590)
             self.mouse_click("left",1160,210)
         else:
             print("no bait left")
             self.stop_game_cycle()
-        time.sleep(0.4)
 
     def rod_interact(self):
         self.key_press("space")
@@ -287,15 +286,15 @@ class Mobile2Bot:
                     mask = cv2.inRange(hsv_img, (0, 169, 157), (10, 189, 237))
 
                     # Use the mask to isolate the red parts of the image
-                    result_img = cv2.bitwise_and(img, img, mask=mask)
+                    # result_img = cv2.bitwise_and(img, img, mask=mask)
 
                     # Save the original and masked images for inspection
-                    cv2.imwrite('original_image.jpg', img)
-                    cv2.imwrite('masked_image.jpg', result_img)
+                    # cv2.imwrite('original_image.jpg', img)
+                    # cv2.imwrite('masked_image.jpg', result_img)
 
                     # Sum the values in the mask to determine the amount of red detected
                     red_detected = np.sum(mask)
-                    print(red_detected)
+                    # print(red_detected)
 
                     # Check if the red object is detected based on the threshold
                     if red_detected < detection_threshold:
@@ -310,7 +309,7 @@ class Mobile2Bot:
                     else:
                         count=0
 
-                    time.sleep(0.1)  # Short delay to avoid excessive CPU usage
+                    time.sleep(0.2)  # Short delay to avoid excessive CPU usage
             except KeyboardInterrupt:
                 print("Stopped monitoring.")
 
@@ -450,7 +449,7 @@ class Mobile2Bot:
         self.focus_game()
         launch_screen_counter=0
         while launch_screen_counter<30:
-            time.sleep(1)
+            time.sleep(2)
             launch_screen_counter+=1
             if self.check_launch_screen_logo():
                 print("Launch screen logo detected.")
@@ -489,9 +488,6 @@ class Mobile2Bot:
         else:
             self.mouse_drag("left", 400, 50, 640, 300, 0.1, 3)
         self.open_inventory()
-        inv_num = self.inventory_count
-        inv_x,inv_y = 850+(inv_num-1)*60, 260
-        self.mouse_click("left",inv_x,inv_y)
 
     def choose_server(self):
         ch_num= self.channel_number-1
