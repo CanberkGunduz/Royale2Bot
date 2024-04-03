@@ -1,0 +1,20 @@
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 18:02:38.415428
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 18:02:55.938229
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 18:04:39.408054
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 18:08:35.507761
+-----------------------

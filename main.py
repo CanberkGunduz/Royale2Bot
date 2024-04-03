@@ -11,6 +11,8 @@ import keyboard
 import cv2
 import time
 import requests as requests
+import win32api
+import win32con
 from PIL import ImageGrab
 import win32gui
 import os
@@ -29,8 +31,8 @@ class Mobile2Bot:
     fish_sens = 0.4
     bait_sens = 0.8
     bait_type_int = 0
-    channel_number = 2
-    character_number = 0
+    channel_number = 1
+    character_number = 3
     inventory_count = 2
     auto_login = 1
     INVENTORY_FULL = False
@@ -41,26 +43,18 @@ class Mobile2Bot:
 
     def __init__(self):
         # self.check_date()
-
         self.img_dict = self.read_images_in_folder()
         self.bait_type = "hamur"
         self.is_running = False  # Flag to control the game cycle
         self.game_cycle_thread = None
         self.party_detection_running = False
-        self.inventory_count = 1
+        self.inventory_count = 2
         self.total_count = 0
         self.caught_count = 0
         self.valuable_count = 0
         self.delay_time = 0.8  # Default delay time
 
-        self.fish_detector()
-        time.sleep(3)
-        self.use_bait_new()
-        time.sleep(3)
-        self.moving_rod_throw()
-        time.sleep(2)
-        self.fish_detector()
-        quit()
+
 
     def check_date(self):
         current_time = time.time()
@@ -91,7 +85,7 @@ class Mobile2Bot:
 
 
     def stop_game_cycle(self):
-        # if not self.check_game_is_open():
+        # if not self.check_bluestacks_is_open():
         #     self.open_game()
         #     return
         self.is_running = False
@@ -129,38 +123,25 @@ class Mobile2Bot:
     def game_cycle(self):
         try:
             while self.is_running:
-                if self.auto_login:
-                    if not self.check_game_is_open():
-                        self.open_game()
-                if not self.locate_image_rgb_fs(self.img_dict["menu"])[0]:
-                    if self.locate_image_rgb_fs(self.img_dict["game_logo_white"],(10,60,40,100))[0]:
-                        if self.locate_image_rgb_fs(self.img_dict["banned"])[0]:
-                            self.send_notification("Account banned.",True)
-                        if self.locate_image_rgb_fs(self.img_dict["connect"])[0]:
-                            self.close_game()
-                        self.resize_window()
-                    if self.locate_image_rgb_fs(self.img_dict["server_closed"])[0]:
-                        print("server is closed")
-                        currentDateAndTime = datetime.now()
-                        with open(f"session_{self.delay_time}.txt", "a") as session_file:
-                            session_file.write(
-                                f"SERVER IS CLOSED\ntotal tries: {self.total_count}\ncaught: {self.caught_count}\nvaluable: {self.valuable_count}\ncurrent date: {currentDateAndTime}\n-----------------------\n")
-                        self.close_game()
-                        time.sleep(120)
-                    continue
+                while (not self.check_bluestacks_is_open()) or (not self.check_game_is_open()):
+                    print("Opening the game...")
+                    self.open_game()
 
                 inv_full = self.check_inventory_full_by_empty_slots()
-                if inv_full:
-                    self.open_fish()
-                    if self.check_inventory_full_by_empty_slots():
-                        self.send_notification("Inventory is full.",send_screenshot=True)
-                        self.stop_game_cycle()
-                        self.close_game()
+                print("Inventory full: ",inv_full)
+                # if inv_full:
+                #     self.open_fish()
+                #     if self.check_inventory_full_by_empty_slots():
+                #         self.send_notification("Inventory is full.",send_screenshot=True)
+                #         self.stop_game_cycle()
+                #         self.close_game()
 
-                count = 0
+                print("Game cycle is working")
                 time.sleep(1)
                 self.use_bait_new()
+                # time.sleep(1)
                 self.moving_rod_throw()
+                time.sleep(3)
                 self.fish_detector()
         except Exception as e:
             with open("log.txt", "a") as log_file:
@@ -205,39 +186,73 @@ class Mobile2Bot:
         p.mouseDown(button="left")
         time.sleep(0.1)
         p.moveTo(300, 0)
-        time.sleep(0.5)
+        time.sleep(0.2)
         self.key_press("space")
-        time.sleep(0.5)
+        time.sleep(0.2)
         p.mouseUp(button="left")
 
-    def choose_character(self,slot):
-        self.mouse_click("left",260,160+90*slot)
+    def choose_character(self):
+        self.mouse_click("left",260,160+90*(self.character_number-1))
         time.sleep(0.5)
         self.mouse_click("left",1000,590)
 
+    def start_bait_thread(self,func):
+        if func == 0:
+            self.bait_thread = threading.Thread(target=self.buy_bait)
+        elif func == 1:
+            self.bait_thread = threading.Thread(target=self.organize_bait)
+        self.focus_game()
+        self.bait_thread.start()
+    def buy_bait(self):
+        self.mouse_click("left",200,10)
+        quantity = int(self.fish_quantity_spinbox.get())
+        self.mouse_click("left",425,125)
+        for _ in range(quantity*4):
+            self.mouse_click("left",615,500)
+        self.mouse_click("left",445,70)
+        print("Baits bought...")
+
+    def organize_bait(self):
+        self.mouse_click("left",200,10)
+        inv_coords = [(845, 150), (935, 150), (845, 180), (935, 180)]
+        vault_coord = self.vault_coord
+        inv_coord = self.inv_coordinates
+        for index in range(12):
+            self.mouse_carry("left", inv_coord[index][0], inv_coord[index][1],
+                             inv_coords[self.inventory_count-1][0],inv_coords[self.inventory_count-1][1],
+                             inv_coord[-index-1][0], inv_coord[-index-1][1])
+            self.mouse_click("left",845,150)
+        else:
+            self.mouse_click("left", inv_coords[self.inventory_count-1][0],inv_coords[self.inventory_count-1][1])
+            print("Baits are organized...")
+
     def open_inventory(self):
         self.mouse_click("left",890,80)
+        inv_num = self.inventory_count
+        inv_x, inv_y = 850 + (inv_num - 1) * 60, 260
+        time.sleep(1)
+        self.mouse_click("left", inv_x, inv_y)
 
     def is_inventory_open(self):
-        detected,_,_ = self.locate_image_rgb_fs(self.img_dict["inventory_open"],bbox=(820,45,1000,72))
+        time.sleep(1)
+        detected,_,_ = self.locate_image_rgb_fs(self.img_dict["Inventory_text"])
         if not detected:
-            self.key_press("I")
+            self.open_inventory()
             return self.is_inventory_open()
         return True
 
     def use_bait_new(self):
         self.open_inventory()
-        time.sleep(0.5)
         detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type], (820, 280, 1180, 640), self.bait_sens)
         if detected:
-            self.mouse_click("left", pos[0] + 10 + 780, pos[1] + 10 + 380)
-            self.mouse_click("left", pos[0] + 10 + 780, pos[1] + 10 + 380)
+            self.mouse_click("left", pos[0] + 10 + 820, pos[1] + 10 + 280)
+            time.sleep(0.1)
+            self.mouse_click("left", 710,590)
             # self.mouse_click("left",710,590)
             self.mouse_click("left",1160,210)
         else:
             print("no bait left")
             self.stop_game_cycle()
-        time.sleep(0.4)
 
     def rod_interact(self):
         self.key_press("space")
@@ -260,7 +275,7 @@ class Mobile2Bot:
         with mss.mss() as sct:
             print("Monitoring for red object. Press Ctrl+C to stop.")
             try:
-                while True:
+                while self.is_running:
                     # Capture the specified area of the screen
                     img = np.array(sct.grab({'top': 80, 'left': 460, 'width': 240, 'height': 100}))
 
@@ -271,21 +286,22 @@ class Mobile2Bot:
                     mask = cv2.inRange(hsv_img, (0, 169, 157), (10, 189, 237))
 
                     # Use the mask to isolate the red parts of the image
-                    result_img = cv2.bitwise_and(img, img, mask=mask)
+                    # result_img = cv2.bitwise_and(img, img, mask=mask)
 
                     # Save the original and masked images for inspection
-                    cv2.imwrite('original_image.jpg', img)
-                    cv2.imwrite('masked_image.jpg', result_img)
+                    # cv2.imwrite('original_image.jpg', img)
+                    # cv2.imwrite('masked_image.jpg', result_img)
 
                     # Sum the values in the mask to determine the amount of red detected
                     red_detected = np.sum(mask)
-                    print(red_detected)
+                    # print(red_detected)
 
                     # Check if the red object is detected based on the threshold
                     if red_detected < detection_threshold:
                         count+=1
-                        if count>=3:
+                        if count>=4:
                             print("Red object possibly underwater, fetching the rod!")
+                            time.sleep(1)
                             self.key_press("space")  # Simulate the key press to fetch the rod
                             self.key_press("space")  # Simulate the key press to fetch the rod
                             time.sleep(1)  # Wait a bit before continuing to monitor
@@ -293,7 +309,7 @@ class Mobile2Bot:
                     else:
                         count=0
 
-                    time.sleep(0.1)  # Short delay to avoid excessive CPU usage
+                    time.sleep(0.2)  # Short delay to avoid excessive CPU usage
             except KeyboardInterrupt:
                 print("Stopped monitoring.")
 
@@ -315,22 +331,36 @@ class Mobile2Bot:
 
 
     def check_inventory_full_by_empty_slots(self):
-        detected, _, _= self.locate_image_rgb_fs(self.img_dict["empty_slot"],(780, 205, 985, 435),0.7)
+        detected, _, _= self.locate_image_rgb_fs(self.img_dict["Empty_slot"],(815, 280, 1185, 650),0.7)
         if not detected:
             return True
 
-    def check_game_is_open(self):
-        game_is_open = None
+    def check_bluestacks_is_open(self):
+        bluestacks_is_open = None
         # Get the window handle (replace 'Your Window Title' with the actual window title)
         window_title = "BlueStacks App Player"
         hwnd = win32gui.FindWindow(None, window_title)
 
         if hwnd == 0:
-            print('Window not found.')
-            game_is_open=False
+            print('Window not found. (Check bluestacks)')
+            bluestacks_is_open=False
         else:
-            game_is_open=True
+            print("Bluestacks is open")
+            bluestacks_is_open=True
+        return bluestacks_is_open
+
+    def check_game_is_open(self):
+        game_is_open = self.locate_image_rgb_fs(self.img_dict["Helmet_logo"],(0,0,90,180))[0]
+        print("Game is open:",game_is_open)
         return game_is_open
+
+    def check_server_screen_is_open(self):
+        server_screen_is_open = self.locate_image_rgb_fs(self.img_dict["Choose_channel"])[0]
+        return server_screen_is_open
+
+    def check_launch_screen_logo(self):
+        launch_screen_logo = self.locate_image_rgb_fs(self.img_dict["Launch_screen_logo"])[0]
+        return launch_screen_logo
 
     def check_game_freeze(self,capture_interval=5, tolerance=1):
 
@@ -372,137 +402,98 @@ class Mobile2Bot:
         self.mouse_click("left", 1250, 700)
         self.mouse_click("left", 850, 90)
 
-    def find_game_logo_and_click(self):
-        _, pos, _ = self.locate_image_rgb_fs(self.img_dict["Game_logo"])  # game logo on desktop
-        self.mouse_click("left", pos[0], pos[1])
-    def open_game(self):
-        retry_count = 0
-        # if self.is_running:
-        #     self.stop_game_cycle()
-        if not self.check_game_is_open():
-            # self.stop_image_detection() # so the auto login works
+    def close_bluestacks_x(self):
+        hwnd= win32gui.FindWindow(None, 'BlueStacks X')
+        win32gui.SendMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+        self.mouse_click("left",1595,77)
+        self.mouse_click("left",1595,77)
 
-            self.find_game_logo_and_click()
-            game_open_checker = 0
-            while not self.check_game_is_open():
-                time.sleep(0.5)
-                game_open_checker+=1
-                if game_open_checker >= 30:
-                    self.find_game_logo_and_click()
-                    game_open_checker=0
-            self.resize_window()
+    def find_game_logo_on_bluestacks_and_click(self):
+        _, pos, _ = self.locate_image_rgb_fs(self.img_dict["Game_logo_bluestacks"])  # game logo on bluestacks
+        self.mouse_click("left", pos[0]+20, pos[1]+20)
+
+    def find_game_logo_on_desktop_and_click(self):
+        _, pos, _ = self.locate_image_rgb_fs(self.img_dict["Game_logo_desktop"])  # game logo on bluestacks
+        self.mouse_click("left", pos[0]+10, pos[1]+10)
+        self.key_press("enter")
+
+
+    def connect_to_game(self):
+        connect_button_pos = self.locate_image_rgb_fs(self.img_dict["Connect_button"])[1]
+        x,y=connect_button_pos[0], connect_button_pos[1]
+        self.mouse_click("left",x,y)
+        connection_check_count = 0
+        while not self.locate_image_rgb_fs(self.img_dict["Select_character"])[0]:
+            connection_check_count+=1
+            time.sleep(0.5)
+            if connection_check_count>=50:
+                print("Could not connect...")
+                print("Closing the game...")
+                self.close_game()
+                return False
+        else:
+            return True
+
+    def open_game(self,retry_count=0):
+        if self.check_bluestacks_is_open() and not self.check_game_is_open():
+            self.find_game_logo_on_bluestacks_and_click()
             time.sleep(10)
-            connected = False
-            launch_start_time= time.time()
-            while not connected:
-                stuck_loading = time.time() - launch_start_time >= 60
-                if stuck_loading:
-                    self.close_game()
-                    return
-                time.sleep(1)
-                self.choose_server()
-                time.sleep(4)
-                connected = self.check_is_connected()
-                if not connected:
-                    if self.locate_image_rgb_fs(self.img_dict["banned"])[0]:
-                        print("account is banned")
-                        with open(f"session_{self.delay_time}.txt", "a") as session_file:
-                            session_file.write(
-                                f"ACCOUNT IS BANNED\n")
-                            self.stop_game_cycle()
-                            self.close_game()
-                            self.send_notification("Account is banned.",send_screenshot=True)
-                            return
-                    self.key_press("enter")
-            time.sleep(1)
-            self.focus_game()
-            self.choose_character(self.character_number)
-            if self.set_ui():
-
-                time.sleep(1)
-                p.hotkey('ctrl', 'f')
-                self.focus_game()
-                # if not self.party_detection_running:
-                #     self.party_detection_running=True
-                #     self.start_party_detection()
+        else:
+            while not self.check_bluestacks_is_open():
+                self.find_game_logo_on_desktop_and_click()
+                time.sleep(10)
+                print("Desktop logo clicked and waited 10 seconds.")
             else:
-                print("something went wrong")
-                retry_count+=1
-                self.mouse_click("left", 993, 14)
-                time.sleep(2)
-                if retry_count<=6:
-                    self.open_game()
-                else:
-                    sys.exit()
+                print("Trying to close bluestacks x")
+                self.close_bluestacks_x()
+        self.focus_game()
+        launch_screen_counter=0
+        while launch_screen_counter<30:
+            time.sleep(2)
+            launch_screen_counter+=1
+            if self.check_launch_screen_logo():
+                print("Launch screen logo detected.")
+            if self.check_server_screen_is_open():
+                break
+        else:
+            if self.locate_image_rgb_fs(self.img_dict["f8_games"])[0]:
+                print("Stuck on initial launch...")
+                print("Restarting...")
+                self.close_game()
+                return
+        if self.check_server_screen_is_open():
+            self.choose_server()
+        else:
+            print("Something went wrong while launching the game")
+            self.close_game()
+            return
+        connection_successful = self.connect_to_game()
+        if connection_successful:
+            self.choose_character()
+            self.mouse_click("left",1010,600) # position of start button
+            self.set_ui()
+        else:
+            retry_count+=1
+            if retry_count==4:
+                self.send_notification("Could not start the game",True)
+                self.stop_game_cycle()
+            else:
+                self.open_game(retry_count)
+
+
 
     def set_ui(self):
-        trial_count = 0
-        inv_coords = [(850, 260),(935, 150),(845, 180),(935, 180)]
-        while True:
-            detected, pos, _ = self.locate_image_rgb_fs(self.img_dict["connected_but_loading"])
-            if not detected:
-                detected, pos, _ = self.locate_image_rgb_fs(self.img_dict["menu"])
-                if detected:
-                    self.mouse_click("left", 890, 90) # open inventory
-                    self.mouse_click("left",850+(self.inventory_count-1)*60, 260)
-                    time.sleep(0.5)
-                    return True
+        while not self.locate_image_rgb_fs(self.img_dict["Hand_pick_logo"])[0]: # signaling the game is open
             time.sleep(1)
-            trial_count += 1
-            if trial_count == 30:
-                trial_count = 0
-
-                return False
+        else:
+            self.mouse_drag("left", 400, 50, 640, 300, 0.1, 3)
+        self.open_inventory()
 
     def choose_server(self):
         ch_num= self.channel_number-1
         ch_coords = [(600 + i * 200, 300 + j * 40) for j in range(3) for i in range(2)]
-        print(ch_coords)
-        print(ch_coords[ch_num])
+        print("Connecting to channel:",ch_num)
         self.mouse_click("left", ch_coords[ch_num][0], ch_coords[ch_num][1])
-
-    def check_is_connected(self):
-        trial_count = 0
-        while True:
-            detected, pos, _ = self.locate_image_rgb_fs(self.img_dict["start"])
-            if detected:
-                return True
-            time.sleep(1)
-            trial_count += 1
-            if trial_count == 8:
-                trial_count = 0
-                return False
-
-    def attach_cheat_engine(self):
-        detected, pos, _ = self.locate_image_rgb_fs(self.img_dict["ch_logo_bar"],bbox=(0,720,width,height))
-        self.mouse_click("left",pos[0]+5,pos[1]+725)
-        time.sleep(2)
-        # detected, pos2, _ = self.locate_image_rgb_fs(self.img_dict["ch_menu_opener"])
-        # self.mouse_click("left",pos2[0]+5,pos2[1]+5)
-        # time.sleep(1)
-        # det_white,pos3,_=  self.locate_image_rgb_fs(self.img_dict["game_logo_white"],bbox=(0,100,width,600),precision=0.7)
-        # det_blue, pos4,_ =self.locate_image_rgb_fs(self.img_dict["game_logo_blue"],bbox=(0,0,width,600))
-        p.hotkey('ctrl', 'p')
-        time.sleep(1)
-        self.key_press("enter")
-        time.sleep(1)
-        self.key_press("enter")
-        # if det_blue:
-        #     self.mouse_click("left",pos4[0]+2,pos4[1]+2)
-        #     time.sleep(1)
-        #     self.key_press("enter")
-        #     time.sleep(1)
-        #     self.key_press("enter")
-        # elif det_white:
-        #     self.mouse_click("left", pos3[0] + 2, pos3[1] + 100 +2)
-        #     time.sleep(1)
-        #     self.key_press("enter")
-        #     time.sleep(1)
-        #     self.key_press("enter")
-        # else:
-        #     self.key_press("enter")
-        #     time.sleep(1)
-        #     self.key_press("enter")
 
     def resize_window(self):
 
@@ -522,7 +513,7 @@ class Mobile2Bot:
             win32gui.SetWindowPos(hwnd, 0, 0, 0, new_width, new_height, 0x0000)  # SWP_NOSIZE flag
 
         else:
-            print('Window not found.')
+            print('Window not found. (Resize)')
 
     def create_gui(self):
         # Create the main window
@@ -693,7 +684,7 @@ class Mobile2Bot:
         character_label = tk.Label(channel_frame, text='Character Number:')
         character_label.pack(side='left', padx=10)
         # Channel number spinbox
-        character_spinbox = tk.Spinbox(channel_frame, from_=1, to=9, increment=1, width=5)
+        character_spinbox = tk.Spinbox(channel_frame, from_=1, to=5, increment=1, width=5)
         character_spinbox.delete(0, "end")
         character_spinbox.insert(0, str(self.character_number))
         character_spinbox.pack(side='left')
@@ -774,7 +765,7 @@ class Mobile2Bot:
         if located_precision > precision:
             detected = True
         if pr:
-            print("fs",located_precision, pos)
+            print("Searching",template[3],located_precision, pos)
         if detected:
             print("detected:",template[3])
         return detected, pos, located_precision,

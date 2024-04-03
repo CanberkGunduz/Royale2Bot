@@ -48,23 +48,23 @@ def detect_and_get_fish(detection_threshold=5000, key_to_press='space'):
                 time.sleep(0.1)  # Short delay to avoid excessive CPU usage
         except KeyboardInterrupt:
             print("Stopped monitoring.")
-detect_and_get_fish()
+# detect_and_get_fish()
 
-# import win32gui
-# def list_window_names():
-#     def winEnumHandler(hwnd, ctx):
-#         if win32gui.IsWindowVisible(hwnd):
-#             print(hex(hwnd), '"' + win32gui.GetWindowText(hwnd) + '"')
-#     win32gui.EnumWindows(winEnumHandler, None)
-#
-#
-# def get_inner_windows(whndl):
-#     def callback(hwnd, hwnds):
-#         if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
-#             hwnds[win32gui.GetClassName(hwnd)] = hwnd
-#         return True
-#     hwnds = {}
-#     win32gui.EnumChildWindows(whndl, callback, hwnds)
-#     return hwnds
-#
-# list_window_names()
+import win32gui
+def list_window_names():
+    def winEnumHandler(hwnd, ctx):
+        if win32gui.IsWindowVisible(hwnd):
+            print(hex(hwnd), '"' + win32gui.GetWindowText(hwnd) + '"')
+    win32gui.EnumWindows(winEnumHandler, None)
+
+
+def get_inner_windows(whndl):
+    def callback(hwnd, hwnds):
+        if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
+            hwnds[win32gui.GetClassName(hwnd)] = hwnd
+        return True
+    hwnds = {}
+    win32gui.EnumChildWindows(whndl, callback, hwnds)
+    return hwnds
+
+list_window_names()

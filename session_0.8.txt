@@ -3,3 +3,273 @@ caught: 0
 valuable: 0
 current date: 2024-04-02 18:11:02.184900
 -----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:07:44.898167
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:11:08.364472
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:14:58.985355
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:25:24.591128
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:26:55.369134
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:36:31.134924
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:36:35.011341
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:37:32.678459
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:38:57.330609
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:39:04.982063
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:40:13.873665
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:40:15.403425
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:40:55.491297
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:42:12.365455
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:59:09.677876
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:59:27.539030
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 16:59:27.721100
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:00:42.853881
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:00:43.014645
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:01:38.703720
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:01:38.840604
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:02:53.195818
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:03:34.433687
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:06:37.634849
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:06:37.955119
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:08:28.523317
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:08:35.811607
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:17:08.861856
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:18:35.177069
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:18:35.721887
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:21:41.248896
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:25:46.511349
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:25:55.487562
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:25:55.623283
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:31:40.824928
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:32:58.589692
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:33:02.178617
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:33:02.321181
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:33:33.991981
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:33:37.064194
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:35:54.814734
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:35:58.651468
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:35:58.804093
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:36:44.264683
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:36:53.327359
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:37:36.310458
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:37:39.514021
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:42:44.179607
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:42:44.347121
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:43:06.965104
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:43:07.109328
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 17:45:51.099587
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 18:09:42.320987
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-03 18:10:49.448810
+-----------------------
