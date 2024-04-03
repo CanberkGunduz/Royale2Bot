@@ -149,8 +149,6 @@ class Mobile2Bot:
                         time.sleep(120)
                     continue
 
-
-                self.is_player_dead()
                 inv_full = self.check_inventory_full_by_empty_slots()
                 if inv_full:
                     self.open_fish()
@@ -216,82 +214,6 @@ class Mobile2Bot:
         self.mouse_click("left",260,160+90*slot)
         time.sleep(0.5)
         self.mouse_click("left",1000,590)
-
-    def start_bait_thread(self,func):
-        if func == 0:
-            self.bait_thread = threading.Thread(target=self.buy_bait)
-        elif func == 1:
-            self.bait_thread = threading.Thread(target=self.organize_bait)
-        elif func == 2:
-            self.bait_thread = threading.Thread(target=self.put_bait_to_vault)
-        elif func == 3:
-            self.bait_thread = threading.Thread(target=self.take_bait_from_vault)
-        self.focus_game()
-        self.bait_thread.start()
-    def buy_bait(self):
-        self.mouse_click("left",200,10)
-        quantity = int(self.fish_quantity_spinbox.get())
-        self.mouse_click("left",425,125)
-        for _ in range(quantity*4):
-            self.mouse_click("left",615,500)
-        self.mouse_click("left",445,70)
-        print("Baits bought...")
-
-    def organize_bait(self):
-        self.mouse_click("left",200,10)
-        inv_coords = [(845, 150), (935, 150), (845, 180), (935, 180)]
-        vault_coord = self.vault_coord
-        inv_coord = self.inv_coordinates
-        for index in range(12):
-            self.mouse_carry("left", inv_coord[index][0], inv_coord[index][1],
-                             inv_coords[self.inventory_count-1][0],inv_coords[self.inventory_count-1][1],
-                             inv_coord[-index-1][0], inv_coord[-index-1][1])
-            self.mouse_click("left",845,150)
-        else:
-            self.mouse_click("left", inv_coords[self.inventory_count-1][0],inv_coords[self.inventory_count-1][1])
-            print("Baits are organized...")
-
-    def take_bait_from_vault(self):
-        self.mouse_click("left",200,10)
-        vault_coord = self.vault_coord
-        for _ in range(12):
-            det, pos, _ = self.locate_image_rgb_fs(self.img_dict["solucan"],bbox=(180,120,640,400),precision=0.5)
-            if not det: break
-            self.mouse_click("right", 180+pos[0], 120+pos[1])
-            time.sleep(0.5)
-        else:
-            self.mouse_click("left",700,100)
-            print("Baits are taken...")
-
-    def put_bait_to_vault(self):
-        self.mouse_click("left",200,10)
-        vault_coord = self.vault_coord
-        inv_coord = self.inv_coordinates
-        for coord_index in range(len(vault_coord)):
-            self.mouse_drag("left", inv_coord[coord_index][0],inv_coord[coord_index][1],vault_coord[coord_index][0], vault_coord[coord_index][1],move_speed=0.1)
-        print("Baits are placed...")
-
-    def trade(self):
-        x1_1, y1_1, x2_1, y2_1 = 801, 222, 383, 315
-        trade_window_squares = [(383, 315), (413, 315), (443, 315), (473, 315), (503, 315), (383, 345), (413, 345), (443, 345), (473, 345), (503, 345), (383, 375), (413, 375), (443, 375), (473, 375), (503, 375), (383, 405), (413, 405), (443, 405), (473, 405), (503, 405)]
-        trade_count=0
-        while True:
-            if self.locate_image_rgb_fs(self.img_dict["trade"],precision=0.8)[0]:
-                # detect trade window incrementally to decide coordinates
-                if trade_count==2:
-                    self.mouse_click("left",845,150)
-                for i in range(3):
-                    for j in range(6):
-                        drag_loc = trade_window_squares[6*i+j][0],trade_window_squares[6*i+j][1]
-                        self.mouse_drag("left", x1_1 + j * 33, trade_count%2*100+y1_1 + i * 33, drag_loc[0],drag_loc[1],0.1,0.1)
-                time.sleep(2)
-                while self.locate_image_rgb_fs(self.img_dict["trade"],precision=0.8)[0]:
-                    time.sleep(3)
-                trade_count += 1
-
-            if trade_count==4:
-                break
-
 
     def open_inventory(self):
         self.mouse_click("left",890,80)
@@ -374,30 +296,6 @@ class Mobile2Bot:
                     time.sleep(0.1)  # Short delay to avoid excessive CPU usage
             except KeyboardInterrupt:
                 print("Stopped monitoring.")
-
-    def detect_and_get_fish(self):
-
-        img = ImageGrab.grab(bbox=(437, 230, 484, 276))
-        img_cv2 = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-
-        current_dir = os.getcwd()
-        file_name = "image.jpg"
-        file_path = os.path.join(current_dir, file_name)
-        cv2.imwrite(file_path, img_cv2)
-        template = [cv2.imread(file_path),0,0,"captured"]
-
-        time.sleep(1)
-        for name in self.dont_take_names:
-            detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[name], (437, 230, 484, 276), 0.7)
-            if detected:
-                self.mouse_click("left", 585, 220)
-                return True,False
-        detected2, pos, located_precision = self.locate_image_rgb_fs(template, (440, 280, 560, 400), 0.1)
-        print("searching item", located_precision, pos)
-        if detected2:
-            print("located item", located_precision, pos)
-            self.mouse_click("left", pos[0] + 25 + 440, pos[1] + 25 + 280)
-            return True,True
 
     def open_fish(self):
         inv_coords = [(845, 150),(935, 150),(845, 180),(935, 180)]
@@ -504,8 +402,6 @@ class Mobile2Bot:
                 time.sleep(1)
                 self.choose_server()
                 time.sleep(4)
-                captcha_done = self.detect_bot_control()
-                print(captcha_done)
                 connected = self.check_is_connected()
                 if not connected:
                     if self.locate_image_rgb_fs(self.img_dict["banned"])[0]:
