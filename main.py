@@ -33,7 +33,7 @@ class Mobile2Bot:
     bait_type_int = 0
     channel_number = 1
     character_number = 3
-    inventory_count = 2
+    inventory_count = 6
     auto_login = 1
     INVENTORY_FULL = False
     pelerin_var = False
@@ -44,11 +44,11 @@ class Mobile2Bot:
     def __init__(self):
         # self.check_date()
         self.img_dict = self.read_images_in_folder()
-        self.bait_type = "hamur"
+        self.bait_type = "Hamur"
         self.is_running = False  # Flag to control the game cycle
         self.game_cycle_thread = None
         self.party_detection_running = False
-        self.inventory_count = 2
+        self.inventory_count = 6
         self.total_count = 0
         self.caught_count = 0
         self.valuable_count = 0
@@ -243,19 +243,35 @@ class Mobile2Bot:
 
     def use_bait_new(self):
         self.open_inventory()
-        detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type], (820, 280, 1180, 640), self.bait_sens)
-        if detected:
-            self.mouse_click("left", pos[0] + 10 + 820, pos[1] + 10 + 280)
+        wallow_det, wallow_pos, _ = self.locate_image_rgb_fs(self.img_dict["Wallow"],(820, 280, 1180, 640), self.bait_sens)
+
+        if wallow_det:
+            self.mouse_click("left", wallow_pos[0] + 10 + 820, wallow_pos[1] + 10 + 280)
             time.sleep(0.1)
-            self.mouse_click("left", 710,590)
+            self.mouse_click("left", 710, 590)
             # self.mouse_click("left",710,590)
-            self.mouse_click("left",1160,210)
+            self.mouse_click("left", 1160, 210)
         else:
-            print("no bait left")
-            self.stop_game_cycle()
+
+            detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type], (820, 280, 1180, 640), self.bait_sens)
+            if detected:
+                self.mouse_click("left", pos[0] + 10 + 820, pos[1] + 10 + 280)
+                time.sleep(0.1)
+                self.mouse_click("left", 710,590)
+                # self.mouse_click("left",710,590)
+                self.mouse_click("left",1160,210)
+            else:
+                print("no bait left")
+                self.stop_game_cycle()
 
     def rod_interact(self):
         self.key_press("space")
+
+    def rod_interact_background(self):
+        hwnd = win32gui.FindWindow(None, "BlueStacks App Player")
+        print(hwnd)
+        win32gui.SendMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_SPACE, 0)
+        # win32gui.PostMessage(hwnd, win32con.WM_KEYUP, win32con.VK_SPACE, 0)
 
     def fish_detector(self):
         detection_threshold = 100
@@ -453,6 +469,7 @@ class Mobile2Bot:
             launch_screen_counter+=1
             if self.check_launch_screen_logo():
                 print("Launch screen logo detected.")
+                time.sleep(5)
             if self.check_server_screen_is_open():
                 break
         else:
@@ -615,9 +632,9 @@ class Mobile2Bot:
 
     def update_bait_type(self, value):
         if value:
-            self.bait_type = "hamur"
+            self.bait_type = "Hamur"
         else:
-            self.bait_type = "solucan"
+            self.bait_type = "Solucan"
 
     def open_bait_window(self):
         config_window = tk.Toplevel(self.root)
@@ -675,7 +692,7 @@ class Mobile2Bot:
         channel_label = tk.Label(channel_frame, text='Channel Number:')
         channel_label.pack(side='left', padx=10)
         # Channel number spinbox
-        channel_spinbox = tk.Spinbox(channel_frame, from_=1, to=9, increment=1, width=5)
+        channel_spinbox = tk.Spinbox(channel_frame, from_=1, to=6, increment=1, width=5)
         channel_spinbox.delete(0, "end")
         channel_spinbox.insert(0, str(self.channel_number))
         channel_spinbox.pack(side='left')
@@ -696,7 +713,7 @@ class Mobile2Bot:
         inventory_count_label = tk.Label(third_row_frame, text='Inventory Count:')
         inventory_count_label.pack(side='left', padx=10)
         # Channel number spinbox
-        inventory_count_spinbox = tk.Spinbox(third_row_frame, from_=1, to=4, increment=1, width=5)
+        inventory_count_spinbox = tk.Spinbox(third_row_frame, from_=1, to=6, increment=1, width=5)
         inventory_count_spinbox.delete(0, "end")
         inventory_count_spinbox.insert(0, str(self.inventory_count))
         inventory_count_spinbox.pack(side='left')
