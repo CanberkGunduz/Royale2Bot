@@ -227,7 +227,7 @@ class Mobile2Bot:
             print("Baits are organized...")
 
     def open_inventory(self):
-        self.mouse_click("left",890,80)
+        self.key_press("I")
         inv_num = self.inventory_count
         inv_x, inv_y = 850 + (inv_num - 1) * 60, 260
         time.sleep(1)
@@ -238,28 +238,30 @@ class Mobile2Bot:
         detected,_,_ = self.locate_image_rgb_fs(self.img_dict["Inventory_text"])
         if not detected:
             self.open_inventory()
+            time.sleep(1)
             return self.is_inventory_open()
         return True
 
     def use_bait_new(self):
-        self.open_inventory()
-        wallow_det, wallow_pos, _ = self.locate_image_rgb_fs(self.img_dict["Wallow"],(820, 280, 1180, 640), self.bait_sens)
-
+        if not self.is_inventory_open():
+            self.open_inventory()
+        wallow_det, wallow_pos, _ = self.locate_image_rgb_fs(self.img_dict["Wallow"],precision= self.bait_sens)
+        close_button_pos = self.locate_image_rgb_fs(self.img_dict["Inventory_close_button"])[1]
         if wallow_det:
-            self.mouse_click("left", wallow_pos[0] + 10 + 820, wallow_pos[1] + 10 + 280)
+            self.mouse_click("left", wallow_pos[0] + 10, wallow_pos[1] + 10)
             time.sleep(0.1)
-            self.mouse_click("left", 710, 590)
-            # self.mouse_click("left",710,590)
-            self.mouse_click("left", 1160, 210)
+            use_button_pos = self.locate_image_rgb_fs(self.img_dict["Use_button"])[1]
+            self.mouse_click("left", use_button_pos[0]+10, use_button_pos[1]+10)
+            self.mouse_click("left", close_button_pos[0]+10, close_button_pos[1]+10)
         else:
 
-            detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type], (820, 280, 1180, 640), self.bait_sens)
+            detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type],precision= self.bait_sens)
             if detected:
-                self.mouse_click("left", pos[0] + 10 + 820, pos[1] + 10 + 280)
+                self.mouse_click("left", pos[0] + 10 , pos[1] + 10)
                 time.sleep(0.1)
-                self.mouse_click("left", 710,590)
-                # self.mouse_click("left",710,590)
-                self.mouse_click("left",1160,210)
+                use_button_pos = self.locate_image_rgb_fs(self.img_dict["Use_button"])[1]
+                self.mouse_click("left", use_button_pos[0], use_button_pos[1])
+                self.mouse_click("left", close_button_pos[0], close_button_pos[1])
             else:
                 print("no bait left")
                 self.stop_game_cycle()
@@ -293,7 +295,7 @@ class Mobile2Bot:
             try:
                 while self.is_running:
                     # Capture the specified area of the screen
-                    img = np.array(sct.grab({'top': 80, 'left': 460, 'width': 240, 'height': 100}))
+                    img = np.array(sct.grab({'top': 80, 'left': 500, 'width': 240, 'height': 100}))
 
                     # Convert the image from BGR to HSV
                     hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -315,7 +317,7 @@ class Mobile2Bot:
                     # Check if the red object is detected based on the threshold
                     if red_detected < detection_threshold:
                         count+=1
-                        if count>=4:
+                        if count>=8:
                             print("Red object possibly underwater, fetching the rod!")
                             time.sleep(1)
                             self.key_press("space")  # Simulate the key press to fetch the rod
@@ -462,6 +464,7 @@ class Mobile2Bot:
             else:
                 print("Trying to close bluestacks x")
                 self.close_bluestacks_x()
+        self.resize_window()
         self.focus_game()
         launch_screen_counter=0
         while launch_screen_counter<30:
