@@ -127,14 +127,15 @@ class Mobile2Bot:
                     print("Opening the game...")
                     self.open_game()
 
-                inv_full = self.check_inventory_full_by_empty_slots()
-                print("Inventory full: ",inv_full)
-                # if inv_full:
-                #     self.open_fish()
-                #     if self.check_inventory_full_by_empty_slots():
-                #         self.send_notification("Inventory is full.",send_screenshot=True)
-                #         self.stop_game_cycle()
-                #         self.close_game()
+                if self.is_inventory_open():
+                    inv_full = self.is_inventory_full()
+                    print("Inventory full: ",inv_full)
+                    if inv_full:
+                        self.open_fish()
+                    # if self.check_inventory_full_by_empty_slots():
+                    #     self.send_notification("Inventory is full.",send_screenshot=True)
+                    #     self.stop_game_cycle()
+                    #     self.close_game()
 
                 print("Game cycle is working")
                 time.sleep(1)
@@ -233,23 +234,30 @@ class Mobile2Bot:
         time.sleep(1)
         self.mouse_click("left", inv_x, inv_y)
 
-    def is_inventory_open(self):
+    def is_inventory_open(self, count=0):
+        if count==5:
+            while (not self.check_bluestacks_is_open()) or (not self.check_game_is_open()):
+                print("Opening the game...")
+                self.open_game()
+            else:
+                count=0
+        count+=1
         time.sleep(1)
         detected,_,_ = self.locate_image_rgb_fs(self.img_dict["Inventory_text"])
         if not detected:
             self.open_inventory()
             time.sleep(1)
-            return self.is_inventory_open()
+            return self.is_inventory_open(count)
         return True
 
     def use_bait_new(self):
         if not self.is_inventory_open():
             self.open_inventory()
-        wallow_det, wallow_pos, _ = self.locate_image_rgb_fs(self.img_dict["Wallow"],precision= self.bait_sens)
+        # wallow_det, wallow_pos, _ = self.locate_image_rgb_fs(self.img_dict["Wallow"],precision= self.bait_sens)
         close_button_pos = self.locate_image_rgb_fs(self.img_dict["Inventory_close_button"])[1]
-        if wallow_det:
+        if False: # wallow_det
             self.mouse_click("left", wallow_pos[0] + 10, wallow_pos[1] + 10)
-            time.sleep(0.1)
+            time.sleep(0.5)
             use_button_pos = self.locate_image_rgb_fs(self.img_dict["Use_button"])[1]
             self.mouse_click("left", use_button_pos[0]+10, use_button_pos[1]+10)
             self.mouse_click("left", close_button_pos[0]+10, close_button_pos[1]+10)
@@ -258,7 +266,7 @@ class Mobile2Bot:
             detected, pos, located_precision = self.locate_image_rgb_fs(self.img_dict[self.bait_type],precision= self.bait_sens)
             if detected:
                 self.mouse_click("left", pos[0] + 10 , pos[1] + 10)
-                time.sleep(0.1)
+                time.sleep(0.5)
                 use_button_pos = self.locate_image_rgb_fs(self.img_dict["Use_button"])[1]
                 self.mouse_click("left", use_button_pos[0], use_button_pos[1])
                 self.mouse_click("left", close_button_pos[0], close_button_pos[1])
@@ -332,24 +340,22 @@ class Mobile2Bot:
                 print("Stopped monitoring.")
 
     def open_fish(self):
-        inv_coords = [(845, 150),(935, 150),(845, 180),(935, 180)]
-
-        for i in range(self.inventory_count):
-
-            self.mouse_click("left", inv_coords[i][0], inv_coords[i][1])
-            x,x_gap,y,y_gap = 800,33,222,32
-            inventory_coords = [(x+i*x_gap,y+j*y_gap) for i in range(6) for j in range(7)]
-
-            for coords in inventory_coords:
-                bbox = (coords[0]-x_gap//2-10,coords[1]-y_gap//2-10,coords[0]+x_gap//2+10,coords[1]+y_gap//2+10)
-                if self.locate_image_rgb_fs(self.img_dict["altin_balik"],bbox)[0]:
-                    continue
-
-                self.mouse_click("right", coords[0], coords[1])
+        inv_y = 260
+        for i in range(5):
+            inv_x = 910+60*i
+            self.mouse_click("left", inv_x, inv_y)
+            for num_row in range(6):
+                for num_col in range(6):
+                    self.mouse_click("left",850+65*num_col,315+60*num_row)
+                    self.mouse_click("left",850+65*num_col,315+60*num_row)
+                    if self.locate_image_rgb_fs(self.img_dict["Clam"])[0]:
+                        self.mouse_click("left", inv_x, inv_y)
 
 
-    def check_inventory_full_by_empty_slots(self):
-        detected, _, _= self.locate_image_rgb_fs(self.img_dict["Empty_slot"],(815, 280, 1185, 650),0.7)
+
+
+    def is_inventory_full(self):
+        detected, _, _= self.locate_image_rgb_fs(self.img_dict["Empty_slot"],(815, 280, 1185, 650),0.6)
         if not detected:
             return True
 
@@ -372,8 +378,8 @@ class Mobile2Bot:
         print("Game is open:",game_is_open)
         return game_is_open
 
-    def check_server_screen_is_open(self):
-        server_screen_is_open = self.locate_image_rgb_fs(self.img_dict["Choose_channel"])[0]
+    def  check_server_screen_is_open(self):
+        server_screen_is_open = self.locate_image_rgb_fs(self.img_dict["Choose_channel"],precision=0.7)[0]
         return server_screen_is_open
 
     def check_launch_screen_logo(self):
@@ -426,6 +432,17 @@ class Mobile2Bot:
         self.mouse_click("left",1595,77)
         self.mouse_click("left",1595,77)
 
+    def close_bluestacks(self):
+        detected, pos, _ = self.locate_image_rgb_fs(self.img_dict["Close_bluestacks_button"])
+        if detected:
+            self.mouse_click("left",pos[0],pos[1])
+            time.sleep(5)
+            det_2, pos_2, _ = self.locate_image_rgb_fs(self.img_dict["Kapat_bluestacks_button"])
+            if det_2:
+                self.mouse_click("left",pos_2[0],pos_2[1])
+                time.sleep(5)
+
+
     def find_game_logo_on_bluestacks_and_click(self):
         _, pos, _ = self.locate_image_rgb_fs(self.img_dict["Game_logo_bluestacks"])  # game logo on bluestacks
         self.mouse_click("left", pos[0]+20, pos[1]+20)
@@ -453,17 +470,13 @@ class Mobile2Bot:
             return True
 
     def open_game(self,retry_count=0):
-        if self.check_bluestacks_is_open() and not self.check_game_is_open():
-            self.find_game_logo_on_bluestacks_and_click()
-            time.sleep(10)
-        else:
-            while not self.check_bluestacks_is_open():
+        if not self.check_game_is_open():
+            self.close_bluestacks()
+            self.find_game_logo_on_desktop_and_click()
+            time.sleep(20)
+            if not self.check_bluestacks_is_open():
                 self.find_game_logo_on_desktop_and_click()
-                time.sleep(10)
-                print("Desktop logo clicked and waited 10 seconds.")
-            else:
-                print("Trying to close bluestacks x")
-                self.close_bluestacks_x()
+                time.sleep(20)
         self.resize_window()
         self.focus_game()
         launch_screen_counter=0

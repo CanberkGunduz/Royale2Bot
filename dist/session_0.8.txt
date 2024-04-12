@@ -103,3 +103,118 @@ caught: 0
 valuable: 0
 current date: 2024-04-05 09:46:59.704619
 -----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 10:12:43.640539
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 10:36:01.360688
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 12:00:40.805635
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 12:00:55.598416
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 14:02:25.976320
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 14:02:27.043362
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 14:04:46.470315
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 14:05:08.226416
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 14:05:26.374804
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 14:05:40.006983
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 15:40:12.324798
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 16:50:23.183094
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 18:04:12.944774
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 18:04:40.472384
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 19:05:19.724555
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 21:26:08.743395
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 21:41:21.424249
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 23:16:52.128322
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-05 23:19:33.578562
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-06 01:23:33.826491
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-06 02:01:41.783483
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-06 06:02:26.107091
+-----------------------
+total tries: 0
+caught: 0
+valuable: 0
+current date: 2024-04-06 06:02:27.232737
+-----------------------
